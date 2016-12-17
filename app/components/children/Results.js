@@ -12,14 +12,15 @@ var Results = React.createClass({
         </div>
         <div className="panel-body text-center">
 
-          <h4>Title:</h4>
-          <p>{this.props.title}</p>
-
-          <h4>Date:</h4>
-          <p>{this.props.date}</p>
-
-          <h4>URL:</h4>
-          <p>{this.props.url}</p>
+          {this.props.articles.map(function(search, i) {
+            return (
+              <div key={i} className = "article">
+                <h4>Title: {search.headline.main}</h4>
+                <h4>Date: {search.pub_date}</h4>
+                <h4>URL: {search.web_url}</h4>
+              </div>
+            )
+          })}
       </div>
     </div>
     );

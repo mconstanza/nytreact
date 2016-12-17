@@ -15,7 +15,7 @@ var Form = React.createClass({
   // This function will respond to the user input
   handleChange: function(event) {
 
-    this.setState({ term: event.target.value });
+    this.setState({ topic: event.target.value });
 
   },
 
@@ -26,8 +26,8 @@ var Form = React.createClass({
     event.preventDefault();
 
     // Set the parent to have the search term
-    this.props.setTerm(this.state.term);
-    this.setState({ term: "" });
+    this.props.setTerm(this.state.topic);
+    this.setState({ topic: "" });
   },
   // Here we describe this component's render method
   render: function() {
@@ -63,7 +63,6 @@ var Form = React.createClass({
                 className="form-control text-center"
                 id="startYear"
                 onChange={this.handleChange}
-                required
               />
               <br />
 
@@ -77,7 +76,6 @@ var Form = React.createClass({
                 className="form-control text-center"
                 id="endYear"
                 onChange={this.handleChange}
-                required
               />
               <br />
 

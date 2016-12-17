@@ -6,14 +6,17 @@ var Form = require("./children/Form");
 var Results = require("./children/Results");
 var Saved = require("./children/Saved");
 
+// Helper for making AJAX requests to our API
+var helpers = require("./utils/helpers");
+
 // Creating the Main component
 var Main = React.createClass({
 
   // Here we set a generic state associated with the number of clicks
   // Note how we added in this history state variable
   getInitialState: function() {
-    return { searchTopic: "", searchStartYear: "", searchEndYear: "",
-             articles: [], savedArticles: [] };
+    return { searchTerm: "", searchStartYear: "", searchEndYear: "",
+             resultsArticles: [], savedArticles: [] };
   },
 
   // The moment the page renders get the History
@@ -24,26 +27,27 @@ var Main = React.createClass({
   // If the component changes (i.e. if a search is entered)...
   componentDidUpdate: function() {
 
-    // Run the query for the address
-    helpers.runQuery(this.state.searchTerm).then(function(data) {
-      if (data !== this.state.results) {
-        console.log("Address", data);
-        this.setState({ results: data });
+    // Run the query for the articles
+    helpers.runQuery(this.state.searchTerm, this.state.searchStartYear, this.state.searchEndYear).then(function(data) {
+      if (data !== this.state.resultsArticles) {
+        console.log("Articles", data);
+        this.setState({ resultsArticles: data });
 
-        // After we've received the result... then post the search term to our history.
-        helpers.postHistory(this.state.searchTerm).then(function() {
-          console.log("Updated!");
-
-          // After we've done the post... then get the updated history
-          helpers.getHistory().then(function(response) {
-            console.log("Current History", response.data);
-
-            console.log("History", response.data);
-
-            this.setState({ history: response.data });
-
-          }.bind(this));
-        }.bind(this));
+      // Move this to 'SAVE BUTTON'
+        // // After we've received the result... then post the search term to our history.
+        // helpers.postHistory(this.state.searchTerm).then(function() {
+        //   console.log("Updated!");
+        //
+        //   // After we've done the post... then get the updated history
+        //   helpers.getHistory().then(function(response) {
+        //     console.log("Current History", response.data);
+        //
+        //     console.log("History", response.data);
+        //
+        //     this.setState({ history: response.data });
+        //
+        //   }.bind(this));
+        // }.bind(this));
       }
     }.bind(this));
   },
@@ -51,6 +55,7 @@ var Main = React.createClass({
   setTerm: function(term) {
     this.setState({ searchTerm: term });
   },
+
   // Here we render the function
   render: function() {
     return (
@@ -69,7 +74,7 @@ var Main = React.createClass({
 
           <div className="row">
 
-            <Results articles={this.state.articles} />
+            <Results articles={this.state.resultsArticles} />
 
           </div>
 
