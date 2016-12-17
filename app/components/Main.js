@@ -21,7 +21,11 @@ var Main = React.createClass({
 
   // The moment the page renders get the History
   componentDidMount: function() {
-
+    helpers.getSaved().then(function(response){
+      if(response !== this.state.savedArticles){
+        this.setState({savedArticles: response.data});
+      }
+    }.bind(this));
   },
 
   // If the component changes (i.e. if a search is entered)...
@@ -56,6 +60,11 @@ var Main = React.createClass({
     this.setState({ searchTerm: term });
   },
 
+  // This function allows the Results to update the Saved Articles
+  setSaved: function(articles) {
+    this.setState({ savedArticles: articles });
+  },
+
   // Here we render the function
   render: function() {
     return (
@@ -74,7 +83,7 @@ var Main = React.createClass({
 
           <div className="row">
 
-            <Results articles={this.state.resultsArticles} />
+            <Results articles={this.state.resultsArticles} setSaved={this.setSaved} />
 
           </div>
 

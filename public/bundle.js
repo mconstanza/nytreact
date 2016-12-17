@@ -19765,7 +19765,7 @@
 	var Saved = __webpack_require__(188);
 
 	// Helper for making AJAX requests to our API
-	var helpers = __webpack_require__(189);
+	var helpers = __webpack_require__(162);
 
 	// Creating the Main component
 	var Main = React.createClass({
@@ -19780,7 +19780,13 @@
 	  },
 
 	  // The moment the page renders get the History
-	  componentDidMount: function componentDidMount() {},
+	  componentDidMount: function componentDidMount() {
+	    helpers.getSaved().then(function (response) {
+	      if (response !== this.state.savedArticles) {
+	        this.setState({ savedArticles: response.data });
+	      }
+	    }.bind(this));
+	  },
 
 	  // If the component changes (i.e. if a search is entered)...
 	  componentDidUpdate: function componentDidUpdate() {
@@ -19814,6 +19820,11 @@
 	    this.setState({ searchTerm: term });
 	  },
 
+	  // This function allows the Results to update the Saved Articles
+	  setSaved: function setSaved(articles) {
+	    this.setState({ savedArticles: articles });
+	  },
+
 	  // Here we render the function
 	  render: function render() {
 	    return React.createElement(
@@ -19839,7 +19850,7 @@
 	        React.createElement(
 	          "div",
 	          { className: "row" },
-	          React.createElement(Results, { articles: this.state.resultsArticles })
+	          React.createElement(Results, { articles: this.state.resultsArticles, setSaved: this.setSaved })
 	        )
 	      ),
 	      React.createElement(
@@ -20002,8 +20013,18 @@
 	    displayName: "Results",
 
 
+	    saveArticle: function saveArticle(article, callback) {
+	        helpers.postSaved(article).then(function () {
+	            helpers.getSaved().then(function (response) {
+	                callback(response.data);
+	            });
+	        });
+	    },
+
 	    // Here we render the function
 	    render: function render() {
+	        var self = this;
+	        var setSaved = this.props.setSaved;
 	        return React.createElement(
 	            "div",
 	            { className: "panel panel-default" },
@@ -20054,7 +20075,7 @@
 	                                React.createElement(
 	                                    "button",
 	                                    { onClick: function onClick() {
-	                                            return helpers.postSaved(search);
+	                                            return self.saveArticle(search, setSaved);
 	                                        }, className: "btn btn-primary" },
 	                                    "Save"
 	                                )
@@ -20109,12 +20130,10 @@
 	            queryURL += "&end_date=" + queryEndYear + "0101";
 	        }
 
-	        console.log("Query: " + queryURL);
-
 	        return axios.get(queryURL).then(function (response) {
 	            // If there are results, pull out the relevant data and send to the user
-	            if (response.docs) {
-	                return response.docs;
+	            if (response.data.response.docs[0]) {
+	                return response.data.response.docs;
 	            }
 	            // If we don't get any results, return an empty string
 	            return "";
@@ -21635,91 +21654,74 @@
 
 	// This is the History component. It will be used to show a log of  recent searches.
 	var Saved = React.createClass({
-	  displayName: "Saved",
+	    displayName: "Saved",
 
-	  // Here we describe this component's render method
-	  render: function render() {
-	    return React.createElement(
-	      "div",
-	      { className: "panel panel-default" },
-	      React.createElement(
-	        "div",
-	        { className: "panel-heading" },
-	        React.createElement(
-	          "h3",
-	          { className: "panel-title text-center" },
-	          "Saved Articles"
-	        )
-	      ),
-	      React.createElement("div", { className: "panel-body text-center" })
-	    );
-	  }
+	    // Here we describe this component's render method
+	    render: function render() {
+	        return React.createElement(
+	            "div",
+	            { className: "panel panel-default" },
+	            React.createElement(
+	                "div",
+	                { className: "panel-heading" },
+	                React.createElement(
+	                    "h3",
+	                    { className: "panel-title text-center" },
+	                    "Saved Articles"
+	                )
+	            ),
+	            React.createElement(
+	                "div",
+	                { className: "panel-body" },
+	                this.props.savedArticles.map(function (search, i) {
+	                    return React.createElement(
+	                        "div",
+	                        { key: i },
+	                        React.createElement(
+	                            "div",
+	                            { className: "savedArticle row" },
+	                            React.createElement(
+	                                "div",
+	                                { className: "col-md-11 savedArticleText" },
+	                                React.createElement(
+	                                    "h4",
+	                                    null,
+	                                    "Title: ",
+	                                    search.title
+	                                ),
+	                                React.createElement(
+	                                    "h4",
+	                                    null,
+	                                    "Date: ",
+	                                    search.date
+	                                ),
+	                                React.createElement(
+	                                    "h4",
+	                                    null,
+	                                    "URL: ",
+	                                    search.url
+	                                )
+	                            ),
+	                            React.createElement(
+	                                "div",
+	                                { className: "col-md-1 savedArticleButtons" },
+	                                React.createElement(
+	                                    "button",
+	                                    { className: "btn btn-primary" },
+	                                    "Delete"
+	                                )
+	                            )
+	                        ),
+	                        React.createElement("hr", null)
+	                    );
+	                })
+	            )
+	        );
+	    }
 	});
 
 	// Export the component back for use in other files
 	module.exports = Saved;
-
-/***/ },
-/* 189 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	// Include the axios package for performing HTTP requests (promise based alternative to request)
-	var axios = __webpack_require__(163);
-
-	// NY-Times API
-	var NYTAPI = "5063f54818154873afa3996286e1b391";
-
-	// Helper functions for making API Calls
-	var helpers = {
-
-	    // This function serves our purpose of running the query to geolocate.
-	    runQuery: function runQuery(topic, startYear, endYear) {
-
-	        var queryTopic = topic;
-	        var queryStartYear = startYear;
-	        var queryEndYear = endYear;
-
-	        console.log(queryTopic, queryStartYear, queryEndYear);
-
-	        // Get the articles from NYT
-
-	        var queryURLBase = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + NYTAPI + "&q=";
-	        var queryURL = queryURLBase + queryTopic;
-
-	        // if the user provides a start year, add it to the query
-	        if (parseInt(queryStartYear)) {
-	            queryURL += "&begin_date=" + queryStartYear + "0101";
-	        }
-	        // if the user provides an end year, add it to the query
-	        if (parseInt(queryEndYear)) {
-	            queryURL += "&end_date=" + queryEndYear + "0101";
-	        }
-
-	        return axios.get(queryURL).then(function (response) {
-	            // If there are results, pull out the relevant data and send to the user
-	            if (response.data.response.docs[0]) {
-	                return response.data.response.docs;
-	            }
-	            // If we don't get any results, return an empty string
-	            return "";
-	        });
-	    },
-
-	    // This function hits our own server to retrieve the record of query results
-	    getSaved: function getSaved() {
-	        return axios.get("/api/saved");
-	    },
-
-	    // This function posts new searches to our database.
-	    postSaved: function postSaved(article) {
-	        return axios.post("/api/saved", { article: article });
-	    }
-	};
-
-	// We export the API helper
-	module.exports = helpers;
 
 /***/ }
 /******/ ]);

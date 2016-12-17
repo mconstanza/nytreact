@@ -65,7 +65,18 @@ app.get("/", function(req, res) {
 });
 
 // Articles
-app.get("/api/saved", function(req, res) {});
+app.get("/api/saved", function(req, res) {
+  Article.find({}).sort([
+    ["createdAt", "descending"]
+  ]).limit(5).exec(function(err, doc) {
+    if(err) {
+      console.log(err);
+    }
+    else {
+      res.send(doc);
+    }
+  });
+});
 
 // This route saves articles when the user clicks the 'save' button
 app.post("/api/saved", function(req, res) {
