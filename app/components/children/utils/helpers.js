@@ -5,7 +5,7 @@ var axios = require("axios");
 var NYTAPI = "5063f54818154873afa3996286e1b391";
 
 // Helper functions for making API Calls
-var helper = {
+var helpers = {
 
     // This function serves our purpose of running the query to geolocate.
     runQuery: function(topic, startYear, endYear) {
@@ -44,14 +44,14 @@ var helper = {
 
     // This function hits our own server to retrieve the record of query results
     getSaved: function() {
-        return axios.get("/api");
+        return axios.get("/api/saved");
     },
 
     // This function posts new searches to our database.
-    postSaved: function(location) {
-        return axios.post("/api", {article: article});
+    postSaved: function(article) {
+        return axios.post("/api/saved", {article: article});
     }
 };
 
 // We export the API helper
-module.exports = helper;
+module.exports = helpers;

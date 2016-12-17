@@ -17,9 +17,9 @@ var PORT = process.env.PORT || 3000;
 // Run Morgan for Logging
 app.use(logger("dev"));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.text());
-app.use(bodyParser.json({ type: "application/vnd.api+json" }));
+app.use(bodyParser.json({type: "application/vnd.api+json"}));
 
 app.use(express.static("./public"));
 
@@ -30,11 +30,11 @@ mongoose.connect("mongodb://heroku_fdj2wmk7:r2npdn9l0c7t24ecprkknkoba9@ds133338.
 var db = mongoose.connection;
 
 db.on("error", function(err) {
-  console.log("Mongoose Error: ", err);
+    console.log("Mongoose Error: ", err);
 });
 
 db.once("open", function() {
-  console.log("Mongoose connection successful.");
+    console.log("Mongoose connection successful.");
 });
 
 // -------------------------------------------------
@@ -45,11 +45,12 @@ require('./app/config/passport')(passport);
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 
-app.use(expressSession({secret: 'darkKnight',
-                        store: new MongoStore({ mongooseConnection: mongoose.connection }),
-                        resave: false,
-                        saveUninitialized: false
-                      }));
+app.use(expressSession({
+    secret: 'darkKnight',
+    store: new MongoStore({mongooseConnection: mongoose.connection}),
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -60,23 +61,31 @@ app.use(passport.session());
 
 // Home page - the user is sent the ReactJS page
 app.get("/", function(req, res) {
-  res.sendFile(__dirname + "/public/index.html");
+    res.sendFile(__dirname + "/public/index.html");
 });
 
 // Articles
-app.get("/api/saved", function(req, res) {
-
-});
+app.get("/api/saved", function(req, res) {});
 
 // This route saves articles when the user clicks the 'save' button
 app.post("/api/saved", function(req, res) {
 
+  console.log(req.body);
+    Article.create({
+        title: req.body.article.headline.main,
+        date: req.body.article.pub_date,
+        url: req.body.article.web_url
+    }, function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send("Article Saved");
+        }
+    });
 });
 
 // This route deletes articles when the user clicks the 'delete' button
-app.delete("/api/saved", function(req, res) {
-
-});
+app.delete("/api/saved", function(req, res) {});
 
 //=============================================
 // SIGNUP
@@ -113,5 +122,5 @@ app.get('/logout', function(req, res) {
 
 // Listener
 app.listen(PORT, function() {
-  console.log("App listening on PORT: " + PORT);
+    console.log("App listening on PORT: " + PORT);
 });

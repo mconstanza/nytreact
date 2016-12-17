@@ -16,6 +16,11 @@ var ArticleSchema = new Schema({
 
   url: {
     type: String
+  },
+
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
   }
 },
 {
