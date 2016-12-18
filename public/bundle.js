@@ -19796,22 +19796,6 @@
 	      if (data !== this.state.resultsArticles) {
 	        console.log("Articles", data);
 	        this.setState({ resultsArticles: data });
-
-	        // Move this to 'SAVE BUTTON'
-	        // // After we've received the result... then post the search term to our history.
-	        // helpers.postHistory(this.state.searchTerm).then(function() {
-	        //   console.log("Updated!");
-	        //
-	        //   // After we've done the post... then get the updated history
-	        //   helpers.getHistory().then(function(response) {
-	        //     console.log("Current History", response.data);
-	        //
-	        //     console.log("History", response.data);
-	        //
-	        //     this.setState({ history: response.data });
-	        //
-	        //   }.bind(this));
-	        // }.bind(this));
 	      }
 	    }.bind(this));
 	  },
@@ -19856,7 +19840,7 @@
 	      React.createElement(
 	        "div",
 	        { className: "row" },
-	        React.createElement(Saved, { savedArticles: this.state.savedArticles })
+	        React.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved })
 	      )
 	    );
 	  }
@@ -20013,6 +19997,8 @@
 	    displayName: "Results",
 
 
+	    // Saves an article to the DB then gets the latest DB entires to refresh the saved Articles
+	    // callback is the "setSaved" function passed from Main.js
 	    saveArticle: function saveArticle(article, callback) {
 	        helpers.postSaved(article).then(function () {
 	            helpers.getSaved().then(function (response) {
@@ -20148,6 +20134,11 @@
 	    // This function posts new searches to our database.
 	    postSaved: function postSaved(article) {
 	        return axios.post("/api/saved", { article: article });
+	    },
+
+	    // This function deletes saved articles.
+	    deleteSaved: function deleteSaved(articleID) {
+	        return axios.delete("/api/saved/" + articleID);
 	    }
 	};
 
@@ -21652,12 +21643,32 @@
 	// Include React
 	var React = __webpack_require__(1);
 
+	// Helper for making AJAX requests to our API
+	var helpers = __webpack_require__(162);
+
 	// This is the History component. It will be used to show a log of  recent searches.
 	var Saved = React.createClass({
 	    displayName: "Saved",
 
+
+	    deleteArticle: function deleteArticle(articleID, callback) {
+	        helpers.deleteSaved(articleID).then(function () {
+	            // THIS PROMISE IS NOT FUNCTIONING CORRECTLY
+
+	            // helpers.getSaved().then(function(response) {
+	            //     callback(response.data);
+	            // })
+	        });
+	        // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
+	        helpers.getSaved().then(function (response) {
+	            callback(response.data);
+	        });
+	    },
+
 	    // Here we describe this component's render method
 	    render: function render() {
+	        var self = this;
+	        var setSaved = this.props.setSaved;
 	        return React.createElement(
 	            "div",
 	            { className: "panel panel-default" },
@@ -21679,7 +21690,7 @@
 	                        { key: i },
 	                        React.createElement(
 	                            "div",
-	                            { className: "savedArticle row" },
+	                            { "data-id": search._id, className: "savedArticle row" },
 	                            React.createElement(
 	                                "div",
 	                                { className: "col-md-11 savedArticleText" },
@@ -21707,7 +21718,9 @@
 	                                { className: "col-md-1 savedArticleButtons" },
 	                                React.createElement(
 	                                    "button",
-	                                    { className: "btn btn-primary" },
+	                                    { onClick: function onClick() {
+	                                            return self.deleteArticle(search._id, setSaved);
+	                                        }, className: "btn btn-primary" },
 	                                    "Delete"
 	                                )
 	                            )

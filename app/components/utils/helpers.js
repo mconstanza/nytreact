@@ -48,6 +48,11 @@ var helpers = {
     // This function posts new searches to our database.
     postSaved: function(article) {
         return axios.post("/api/saved", {article: article});
+    },
+
+    // This function deletes saved articles.
+    deleteSaved: function(articleID) {
+      return axios.delete("/api/saved/" + articleID);
     }
 };
 

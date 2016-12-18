@@ -36,22 +36,6 @@ var Main = React.createClass({
       if (data !== this.state.resultsArticles) {
         console.log("Articles", data);
         this.setState({ resultsArticles: data });
-
-      // Move this to 'SAVE BUTTON'
-        // // After we've received the result... then post the search term to our history.
-        // helpers.postHistory(this.state.searchTerm).then(function() {
-        //   console.log("Updated!");
-        //
-        //   // After we've done the post... then get the updated history
-        //   helpers.getHistory().then(function(response) {
-        //     console.log("Current History", response.data);
-        //
-        //     console.log("History", response.data);
-        //
-        //     this.setState({ history: response.data });
-        //
-        //   }.bind(this));
-        // }.bind(this));
       }
     }.bind(this));
   },
@@ -91,7 +75,7 @@ var Main = React.createClass({
 
         <div className="row">
 
-          <Saved savedArticles={this.state.savedArticles} />
+          <Saved savedArticles={this.state.savedArticles} setSaved={this.setSaved} />
 
         </div>
 

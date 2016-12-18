@@ -37,6 +37,8 @@ db.once("open", function() {
     console.log("Mongoose connection successful.");
 });
 
+mongoose.Promise = Promise;
+
 // -------------------------------------------------
 
 // Passport Configuration
@@ -66,22 +68,21 @@ app.get("/", function(req, res) {
 
 // Articles
 app.get("/api/saved", function(req, res) {
-  Article.find({}).sort([
-    ["createdAt", "descending"]
-  ]).limit(5).exec(function(err, doc) {
-    if(err) {
-      console.log(err);
-    }
-    else {
-      res.send(doc);
-    }
-  });
+    Article.find({}).sort([
+        ["createdAt", "descending"]
+    ]).limit(5).exec(function(err, doc) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(doc);
+        }
+    });
 });
 
 // This route saves articles when the user clicks the 'save' button
 app.post("/api/saved", function(req, res) {
 
-  console.log(req.body);
+    console.log(req.body);
     Article.create({
         title: req.body.article.headline.main,
         date: req.body.article.pub_date,
@@ -96,7 +97,22 @@ app.post("/api/saved", function(req, res) {
 });
 
 // This route deletes articles when the user clicks the 'delete' button
-app.delete("/api/saved", function(req, res) {});
+app.delete("/api/saved/:articleID", function(req, res) {
+    // console.log(JSON.stringify(req.body));
+    Article.findByIdAndRemove(mongoose.Types.ObjectId(req.params.articleID), function(err, article) {
+      if (err) {
+        console.log(err);
+      }
+      else{
+        // var response = {
+        //     message: "Article deleted.",
+        //     id: article._id
+        // };
+        // res.send(response);
+      }
+
+    });
+});
 
 //=============================================
 // SIGNUP
