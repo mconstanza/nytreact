@@ -51,10 +51,10 @@
 	var ReactDOM = __webpack_require__(158);
 
 	// Include the main Main Component
-	var Main = __webpack_require__(159);
+	var App = __webpack_require__(159);
 
 	// This code here allows us to render our main component (in this case Main)
-	ReactDOM.render(React.createElement(Main, null), document.getElementById("app"));
+	ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
 
 /***/ },
 /* 1 */
@@ -19756,8 +19756,20 @@
 
 	"use strict";
 
-	// Include React
-	var React = __webpack_require__(1);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // Include React
+
 
 	// Here we include all of the sub-components
 	var Form = __webpack_require__(160);
@@ -19767,87 +19779,150 @@
 	// Helper for making AJAX requests to our API
 	var helpers = __webpack_require__(162);
 
+	// OAuth Configuration
+	var config = __webpack_require__(189);
+
 	// Creating the Main component
-	var Main = React.createClass({
-	  displayName: "Main",
 
+	var AppComponent = function (_Component) {
+	  _inherits(AppComponent, _Component);
 
-	  // Here we set a generic state associated with the number of clicks
-	  // Note how we added in this history state variable
-	  getInitialState: function getInitialState() {
-	    return { searchTerm: "", searchStartYear: "", searchEndYear: "",
-	      resultsArticles: [], savedArticles: [] };
-	  },
+	  function AppComponent() {
+	    _classCallCheck(this, AppComponent);
+
+	    var _this = _possibleConstructorReturn(this, (AppComponent.__proto__ || Object.getPrototypeOf(AppComponent)).call(this));
+
+	    _this.login = _this.login.bind(_this);
+	    _this.logout = _this.logout.bind(_this);
+
+	    _this.state = { searchTerm: "", searchStartYear: "", searchEndYear: "",
+	      resultsArticles: [], savedArticles: [], authenticated: false };
+	    return _this;
+	  }
 
 	  // The moment the page renders get the History
-	  componentDidMount: function componentDidMount() {
-	    helpers.getSaved().then(function (response) {
-	      if (response !== this.state.savedArticles) {
-	        this.setState({ savedArticles: response.data });
-	      }
-	    }.bind(this));
-	  },
 
-	  // If the component changes (i.e. if a search is entered)...
-	  componentDidUpdate: function componentDidUpdate() {
 
-	    // Run the query for the articles
-	    helpers.runQuery(this.state.searchTerm, this.state.searchStartYear, this.state.searchEndYear).then(function (data) {
-	      if (data !== this.state.resultsArticles) {
-	        console.log("Articles", data);
-	        this.setState({ resultsArticles: data });
-	      }
-	    }.bind(this));
-	  },
-	  // This function allows childrens to update the parent.
-	  setTerm: function setTerm(term) {
-	    this.setState({ searchTerm: term });
-	  },
+	  _createClass(AppComponent, [{
+	    key: "componentDidMount",
+	    value: function componentDidMount() {
+	      helpers.getSaved().then(function (response) {
+	        if (response !== this.state.savedArticles) {
+	          this.setState({ savedArticles: response.data });
+	        }
+	      }.bind(this));
+	    }
+	  }, {
+	    key: "componentWillMount",
+	    value: function componentWillMount() {
+	      this.lock = new Auth0Lock(config.auth0ClientId, config.domain);
+	    }
 
-	  // This function allows the Results to update the Saved Articles
-	  setSaved: function setSaved(articles) {
-	    this.setState({ savedArticles: articles });
-	  },
+	    // If the component changes (i.e. if a search is entered)...
 
-	  // Here we render the function
-	  render: function render() {
-	    return React.createElement(
-	      "div",
-	      { className: "container" },
-	      React.createElement(
+	  }, {
+	    key: "componentDidUpdate",
+	    value: function componentDidUpdate() {
+
+	      // Run the query for the articles
+	      helpers.runQuery(this.state.searchTerm, this.state.searchStartYear, this.state.searchEndYear).then(function (data) {
+	        if (data !== this.state.resultsArticles) {
+	          console.log("Articles", data);
+	          this.setState({ resultsArticles: data });
+	        }
+	      }.bind(this));
+	    }
+	  }, {
+	    key: "login",
+	    value: function login() {
+	      var _this2 = this;
+
+	      // We can call the show method from Auth0Lock,
+	      // which is passed down as a prop, to allow
+	      // the user to log in
+	      this.lock.show(function (err, profile, token) {
+	        if (err) {
+	          alert(err);
+	          return;
+	        }
+	        _this2.setState({ authenticated: true });
+	      });
+	    }
+	  }, {
+	    key: "logout",
+	    value: function logout() {
+	      // AuthActions.logUserOut();
+	      this.setState({ authenticated: false });
+	    }
+
+	    // This function allows childrens to update the parent.
+
+	  }, {
+	    key: "setTerm",
+	    value: function setTerm(term) {
+	      this.setState({ searchTerm: term });
+	    }
+
+	    // This function allows the Results to update the Saved Articles
+
+	  }, {
+	    key: "setSaved",
+	    value: function setSaved(articles) {
+	      this.setState({ savedArticles: articles });
+	    }
+
+	    // Here we render the function
+
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
 	        "div",
-	        { className: "row" },
-	        React.createElement(
+	        { className: "container" },
+	        _react2.default.createElement(
 	          "div",
-	          { className: "jumbotron" },
-	          React.createElement(
-	            "h2",
-	            { className: "text-center" },
-	            "NYT - React"
+	          { className: "row" },
+	          _react2.default.createElement(
+	            "div",
+	            { className: "jumbotron" },
+	            _react2.default.createElement(
+	              "h2",
+	              { className: "text-center" },
+	              "NYT - React"
+	            ),
+	            !this.state.authenticated && _react2.default.createElement(
+	              "button",
+	              { onClick: this.login, className: "btn btn-success" },
+	              "Login"
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "row" },
+	            _react2.default.createElement(Form, { setTerm: this.setTerm })
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "row" },
+	            _react2.default.createElement(Results, { articles: this.state.resultsArticles, setSaved: this.setSaved })
 	          )
 	        ),
-	        React.createElement(
+	        _react2.default.createElement(
 	          "div",
 	          { className: "row" },
-	          React.createElement(Form, { setTerm: this.setTerm })
-	        ),
-	        React.createElement(
-	          "div",
-	          { className: "row" },
-	          React.createElement(Results, { articles: this.state.resultsArticles, setSaved: this.setSaved })
+	          _react2.default.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved })
 	        )
-	      ),
-	      React.createElement(
-	        "div",
-	        { className: "row" },
-	        React.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved })
-	      )
-	    );
-	  }
-	});
+	      );
+	    }
+	  }]);
+
+	  return AppComponent;
+	}(_react.Component);
 
 	// Export the component back for use in other files
-	module.exports = Main;
+
+
+	module.exports = AppComponent;
 
 /***/ },
 /* 160 */
@@ -21735,6 +21810,21 @@
 
 	// Export the component back for use in other files
 	module.exports = Saved;
+
+/***/ },
+/* 189 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var config = {
+	  domain: 'mconstanza.auth0.com',
+	  auth0Secret: 'SsoEWeTp4FZUNLSOkeviipqq39eAS9mtmHaIz3vhDj098-AA0GTgpcm_CD3ofm4-',
+	  auth0ClientId: 'hFHhbzhvUj6iii7amGNQs1Uxf7EhxFxI'
+
+	};
+
+	module.exports = config;
 
 /***/ }
 /******/ ]);

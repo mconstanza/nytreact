@@ -4,6 +4,8 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var flash = require('connect-flash');
+var jwt = require('express-jwt');
+var cors = require('cors');
 
 // MongoDB Schemas
 var Article = require('./models/Article.js');
@@ -40,10 +42,8 @@ db.once("open", function() {
 mongoose.Promise = Promise;
 
 // -------------------------------------------------
+// Session Configuration
 
-// Passport Configuration
-var passport = require('passport');
-require('./app/config/passport')(passport);
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 
@@ -53,9 +53,20 @@ app.use(expressSession({
     resave: false,
     saveUninitialized: false
 }));
-app.use(flash());
-app.use(passport.initialize());
-app.use(passport.session());
+
+//===========================================================
+// Auth
+//===========================================================
+var config = require('./app/config/config.js');
+app.use(cors());
+
+// Authentication middleware provided by express-jwt.
+// This middleware will check incoming requests for a valid
+// JWT on any routes that it is applied to.
+var authCheck = jwt({
+  secret: new Buffer(config.auth0Secret, 'base64'),
+  audience: config.auth0ClientId
+});
 
 //===========================================================
 // Router
@@ -121,28 +132,22 @@ app.get('/signup', function(req, res) {
     res.render('signup');
 });
 
-app.post('/signup', passport.authenticate('signup', {
-    successRedirect: '/',
-    failureRedirect: '/signup/',
-    failureFlash: false
-}));
+app.post('/signup', function(req,res){
+});
 
 //=============================================
 // LOGIN
 //=============================================
 app.get('/login', function(req, res) {
-    res.render('login');
+
 });
 
-app.post('/login', passport.authenticate('login', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: false
-}));
+app.post('/login', function(req, res) {
+
+});
 
 app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
+
 });
 
 // -------------------------------------------------
