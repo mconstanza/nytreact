@@ -3,7 +3,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-var flash = require('connect-flash');
+var jwt = require('express-jwt');
+var cors = require('cors');
 
 // MongoDB Schemas
 var Article = require('./models/Article.js');
@@ -40,10 +41,8 @@ db.once("open", function() {
 mongoose.Promise = Promise;
 
 // -------------------------------------------------
+// Session Configuration
 
-// Passport Configuration
-var passport = require('passport');
-require('./app/config/passport')(passport);
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 
@@ -53,9 +52,20 @@ app.use(expressSession({
     resave: false,
     saveUninitialized: false
 }));
-app.use(flash());
-app.use(passport.initialize());
-app.use(passport.session());
+
+//===========================================================
+// Auth
+//===========================================================
+var config = require('./app/config/config.js');
+app.use(cors());
+
+// Authentication middleware provided by express-jwt.
+// This middleware will check incoming requests for a valid
+// JWT on any routes that it is applied to.
+var authCheck = jwt({
+  secret: new Buffer(config.auth0Secret, 'base64'),
+  audience: config.auth0ClientId
+});
 
 //===========================================================
 // Router
@@ -67,8 +77,8 @@ app.get("/", function(req, res) {
 });
 
 // Articles
-app.get("/api/saved", function(req, res) {
-    Article.find({}).sort([
+app.get("/api/users/:userId/saved", authCheck, function(req, res) {
+    Article.find({'user': req.params.userId}).sort([
         ["createdAt", "descending"]
     ]).limit(5).exec(function(err, doc) {
         if (err) {
@@ -80,13 +90,14 @@ app.get("/api/saved", function(req, res) {
 });
 
 // This route saves articles when the user clicks the 'save' button
-app.post("/api/saved", function(req, res) {
+app.post("/api/users/:userId/saved", authCheck, function(req, res) {
 
-    console.log(req.body);
+    console.log('Req body: ' + JSON.stringify(req.body));
     Article.create({
-        title: req.body.article.headline.main,
-        date: req.body.article.pub_date,
-        url: req.body.article.web_url
+        title: req.body.headline.main,
+        date: req.body.pub_date,
+        url: req.body.web_url,
+        user: req.params.userId
     }, function(err) {
         if (err) {
             console.log(err);
@@ -97,7 +108,7 @@ app.post("/api/saved", function(req, res) {
 });
 
 // This route deletes articles when the user clicks the 'delete' button
-app.delete("/api/saved/:articleID", function(req, res) {
+app.delete("/api/users/:userId/saved/:articleID", authCheck, function(req, res) {
     // console.log(JSON.stringify(req.body));
     Article.findByIdAndRemove(mongoose.Types.ObjectId(req.params.articleID), function(err, article) {
       if (err) {
@@ -112,37 +123,6 @@ app.delete("/api/saved/:articleID", function(req, res) {
       }
 
     });
-});
-
-//=============================================
-// SIGNUP
-//=============================================
-app.get('/signup', function(req, res) {
-    res.render('signup');
-});
-
-app.post('/signup', passport.authenticate('signup', {
-    successRedirect: '/',
-    failureRedirect: '/signup/',
-    failureFlash: false
-}));
-
-//=============================================
-// LOGIN
-//=============================================
-app.get('/login', function(req, res) {
-    res.render('login');
-});
-
-app.post('/login', passport.authenticate('login', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: false
-}));
-
-app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
 });
 
 // -------------------------------------------------
