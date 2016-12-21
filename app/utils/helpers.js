@@ -41,19 +41,19 @@ var helpers = {
     },
 
     // This function hits our own server to retrieve the record of query results
-    getSaved: function() {
-        return axios.get("/api/saved");
-    },
-
-    // This function posts new searches to our database.
-    postSaved: function(article) {
-        return axios.post("/api/saved", {article: article});
-    },
-
-    // This function deletes saved articles.
-    deleteSaved: function(articleID) {
-      return axios.delete("/api/saved/" + articleID);
-    }
+    // getSaved: function() {
+    //     return axios.get("/api/saved");
+    // },
+    //
+    // // This function posts new searches to our database.
+    // postSaved: function(article) {
+    //     return axios.post("/api/saved", {article: article});
+    // },
+    //
+    // // This function deletes saved articles.
+    // deleteSaved: function(articleID) {
+    //   return axios.delete("/api/saved/" + articleID);
+    // }
 };
 
 // We export the API helper

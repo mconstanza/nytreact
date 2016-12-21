@@ -4,22 +4,20 @@ var React = require("react");
 // Helper for making AJAX requests to our API
 var helpers = require("../../utils/helpers");
 
+import ArticleActions from '../../actions/ArticleActions';
+
 // This is the History component. It will be used to show a log of  recent searches.
 var Saved = React.createClass({
 
     deleteArticle: function(articleID, callback) {
-        helpers.deleteSaved(articleID)
-        .then(function() {
-          // THIS PROMISE IS NOT FUNCTIONING CORRECTLY
+        // helpers.deleteSaved(articleID)
+        // // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
+        // helpers.getSaved().then(function(response) {
+        //     callback(response.data);
+        //   });
 
-            // helpers.getSaved().then(function(response) {
-            //     callback(response.data);
-            // })
-        })
-        // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
-        helpers.getSaved().then(function(response) {
-            callback(response.data);
-          });
+        ArticleActions.deleteArticle(articleID);
+        ArticleActions.receiveArticles();
     },
     // Here we describe this component's render method
     render: function() {
@@ -38,12 +36,12 @@ var Saved = React.createClass({
                         return (
                             <div key={i}>
                                 <div data-id={search._id} className="savedArticle row">
-                                    <div className="col-md-11 savedArticleText">
-                                        <h4>Title: {search.title}</h4>
-                                        <h4>Date: {search.date}</h4>
-                                        <h4>URL: {search.url}</h4>
+                                    <div className="col-md-10 savedArticleText">
+                                        <p>Title: {search.title}</p>
+                                        <p>Date: {search.date}</p>
+                                        <p>URL: <a href={search.url}>{search.url} </a></p>
                                     </div>
-                                    <div className="col-md-1 savedArticleButtons">
+                                    <div className="col-md-2 savedArticleButtons">
                                         <button onClick={() => self.deleteArticle(search._id, setSaved)} className="btn btn-primary">Delete</button>
                                     </div>
                                 </div>

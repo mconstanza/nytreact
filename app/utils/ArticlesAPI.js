@@ -25,6 +25,18 @@ saveArticle:(url, article) => {
       resolve(JSON.parse(response.text));
     })
   })
+},
+
+deleteArticle:(url) => {
+  return new Promise((resolve, reject) => {
+    request
+    .delete (url)
+    .set('Authorization', 'Bearer ' + AuthStore.getJwt())
+    .end ((err, response) => {
+      if (err) reject(err);
+      resolve(JSON.parse(response.text));
+    })
+  })
 }
 
 }

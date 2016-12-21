@@ -10,21 +10,29 @@ var Results = React.createClass({
 
         // Saves an article to the DB then gets the latest DB entires to refresh the saved Articles
         // callback is the "setSaved" function passed from Main.js
-        saveArticle: function(article, callback) {
-            // helpers.postSaved(article)
-            // .then(function() {
-            //   helpers.getSaved().then(function(response){
-            //     callback(response.data)
-            //   })
-            // })
+        saveArticle: function(article, results, setResults) {
             ArticleActions.saveArticle(article);
             ArticleActions.receiveArticles();
+            var results = this.removeResultFromResults(article, results)
+            setResults(results);
+
+        },
+
+        removeResultFromResults: function(article, results) {
+            for (var i = 0; i < results.length; i++) {
+              console.log("Results: " + results[i])
+              if (results[i].id == article.id) {
+                  results.splice(i, 1);
+              }
+            }
+            return results
         },
 
     // Here we render the function
     render : function() {
         var self = this;
         var setSaved = this.props.setSaved;
+        var setResults = this.props.setResults;
         return (
             <div className="panel panel-default">
                 <div className="panel-heading">
@@ -36,20 +44,19 @@ var Results = React.createClass({
                         return (
                             <div key={i}>
                                 <div className="article row">
-                                    <div className="col-md-11 articleText">
-                                        <h4>Title: {search.headline.main}</h4>
-                                        <h4>Date: {search.pub_date}</h4>
-                                        <h4>URL: {search.web_url}</h4>
+                                    <div className="col-md-10 articleText text-left">
+                                        <p>Title: {search.headline.main}</p>
+                                        <p>Date: {search.pub_date}</p>
+                                        <p>URL: <a href={search.web_url}>{search.web_url} </a></p>
                                     </div>
-                                    <div className="col-md-1 articleButtons">
-                                        <button onClick={() => self.saveArticle(search, setSaved)} className="btn btn-primary">Save</button>
+                                    <div className="col-md-2 articleButtons">
+                                        <button onClick={() => self.saveArticle(search, self.props.resultsArticles, setResults)} className="btn btn-primary">Save</button>
                                     </div>
                                 </div>
                                 <hr/>
                             </div>
                         )
                     })}
-
                 </div>
             </div>
         );

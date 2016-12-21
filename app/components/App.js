@@ -46,6 +46,10 @@ class AppComponent extends Component {
         this.setSaved = (articles) => {
             this.setState({savedArticles: articles});
         }
+
+        this.setResults = (articles) => {
+            this.setState({resultsArticles: articles});
+        }
     }
 
     // The moment the page renders get the History
@@ -69,9 +73,7 @@ class AppComponent extends Component {
     }
 
     onChange() {
-        this.setState({
-          savedArticles: ArticleStore.getSavedArticles()
-        });
+        this.setState({savedArticles: ArticleStore.getSavedArticles()});
     }
 
     // If the component changes (i.e. if a search is entered)...
@@ -96,10 +98,7 @@ class AppComponent extends Component {
                 return;
             }
             AuthActions.logUserIn(profile, token);
-            this.setState({
-                authenticated: AuthStore.isAuthenticated(),
-                savedArticles: ArticleStore.getSavedArticles()
-            });
+            this.setState({authenticated: AuthStore.isAuthenticated(), savedArticles: ArticleStore.getSavedArticles()});
         });
     }
 
@@ -117,11 +116,17 @@ class AppComponent extends Component {
 
     // Here we render the function
     render() {
+
+        var headingStyle = {
+
+                fontFamily: 'Julius Sans One'
+
+        }
         return (
             <div className="container">
                 <div className="row">
                     <div className="jumbotron text-center">
-                        <h2 className="text-center">NYT - React</h2>
+                        <h2 style={headingStyle} className="text-center">NYT - React</h2>
                         {!this.state.authenticated && <button onClick={this.login} className="btn btn-success">Login</button>}
                         {this.state.authenticated && <button onClick={this.logout} className="btn btn-danger">Logout</button>}
 
@@ -129,23 +134,23 @@ class AppComponent extends Component {
 
                     <div className="row">
 
-                        <Form setTerm={this.setTerm}/>
+                        <div className="col-md-6">
+                            <Form setTerm={this.setTerm} resultsArticles={this.state.resultsArticles} setSaved={this.setSaved} setResults={this.setResults}/>
+                        </div>
 
-                    </div>
+                        <div className="col-md-6">
+                            <Saved savedArticles={this.state.savedArticles} setSaved={this.setSaved}/> {/* <Results articles={this.state.resultsArticles} setSaved={this.setSaved}/> */}
 
-                    <div className="row">
-
-                        <Results articles={this.state.resultsArticles} setSaved={this.setSaved}/>
-
+                        </div>
                     </div>
 
                 </div>
 
-                <div className="row">
+                {/* <div className="row">
 
-                    <Saved savedArticles={this.state.savedArticles} setSaved={this.setSaved}/>
 
-                </div>
+
+                </div> */}
 
             </div>
         );

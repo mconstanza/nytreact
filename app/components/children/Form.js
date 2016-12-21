@@ -1,6 +1,8 @@
 // Include React
 var React = require("react");
 
+var Results = require("./Results")
+
 // Creating the Form component
 var Form = React.createClass({
 
@@ -39,9 +41,9 @@ var Form = React.createClass({
         <div className="panel-body text-center">
           <form onSubmit={this.handleSubmit}>
             <div className="form-group">
-              <h4 className="">
+              <h5 className="">
                 <strong>Article Topic</strong>
-              </h4>
+              </h5>
 
               <input
                 value={this.state.topic}
@@ -53,9 +55,9 @@ var Form = React.createClass({
               />
               <br />
 
-              <h4 className="">
+              <h5 className="">
                 <strong>Start Year</strong>
-              </h4>
+              </h5>
 
               <input
                 value={this.state.startYear}
@@ -66,9 +68,9 @@ var Form = React.createClass({
               />
               <br />
 
-              <h4 className="">
+              <h5 className="">
                 <strong>End Year</strong>
-              </h4>
+              </h5>
 
               <input
                 value={this.state.endYear}
@@ -87,7 +89,9 @@ var Form = React.createClass({
               </button>
             </div>
           </form>
+          <Results articles={this.props.resultsArticles} setSaved={this.props.setSaved} setResults = {this.props.setResults}/>
         </div>
+
       </div>
     );
   }

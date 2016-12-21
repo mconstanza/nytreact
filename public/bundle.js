@@ -19832,6 +19832,10 @@
 	        _this.setSaved = function (articles) {
 	            _this.setState({ savedArticles: articles });
 	        };
+
+	        _this.setResults = function (articles) {
+	            _this.setState({ resultsArticles: articles });
+	        };
 	        return _this;
 	    }
 
@@ -19862,9 +19866,7 @@
 	    }, {
 	        key: "onChange",
 	        value: function onChange() {
-	            this.setState({
-	                savedArticles: _ArticleStore2.default.getSavedArticles()
-	            });
+	            this.setState({ savedArticles: _ArticleStore2.default.getSavedArticles() });
 	        }
 
 	        // If the component changes (i.e. if a search is entered)...
@@ -19895,10 +19897,7 @@
 	                    return;
 	                }
 	                _AuthActions2.default.logUserIn(profile, token);
-	                _this2.setState({
-	                    authenticated: _AuthStore2.default.isAuthenticated(),
-	                    savedArticles: _ArticleStore2.default.getSavedArticles()
-	                });
+	                _this2.setState({ authenticated: _AuthStore2.default.isAuthenticated(), savedArticles: _ArticleStore2.default.getSavedArticles() });
 	            });
 	        }
 	    }, {
@@ -19920,6 +19919,12 @@
 	    }, {
 	        key: "render",
 	        value: function render() {
+
+	            var headingStyle = {
+
+	                fontFamily: 'Julius Sans One'
+
+	            };
 	            return _react2.default.createElement(
 	                "div",
 	                { className: "container" },
@@ -19931,7 +19936,7 @@
 	                        { className: "jumbotron text-center" },
 	                        _react2.default.createElement(
 	                            "h2",
-	                            { className: "text-center" },
+	                            { style: headingStyle, className: "text-center" },
 	                            "NYT - React"
 	                        ),
 	                        !this.state.authenticated && _react2.default.createElement(
@@ -19948,18 +19953,18 @@
 	                    _react2.default.createElement(
 	                        "div",
 	                        { className: "row" },
-	                        _react2.default.createElement(Form, { setTerm: this.setTerm })
-	                    ),
-	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "row" },
-	                        _react2.default.createElement(Results, { articles: this.state.resultsArticles, setSaved: this.setSaved })
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-md-6" },
+	                            _react2.default.createElement(Form, { setTerm: this.setTerm, resultsArticles: this.state.resultsArticles, setSaved: this.setSaved, setResults: this.setResults })
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-md-6" },
+	                            _react2.default.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved }),
+	                            " "
+	                        )
 	                    )
-	                ),
-	                _react2.default.createElement(
-	                    "div",
-	                    { className: "row" },
-	                    _react2.default.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved })
 	                )
 	            );
 	        }
@@ -20899,9 +20904,16 @@
 	    });
 	  },
 
-	  saveArticle: function saveArticle(article) {
+	  saveArticle: function saveArticle(articleId) {
 	    var user = JSON.parse(_AuthStore2.default.getUser());
-	    _ArticlesAPI2.default.saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', article).then(function (response) {
+	    _ArticlesAPI2.default.saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId).then(function (response) {
+	      console.log(response);
+	    });
+	  },
+
+	  deleteArticle: function deleteArticle(articleId) {
+	    var user = JSON.parse(_AuthStore2.default.getUser());
+	    _ArticlesAPI2.default.deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId).then(function (response) {
 	      console.log(response);
 	    });
 	  },
@@ -20980,6 +20992,15 @@
 	  saveArticle: function saveArticle(url, article) {
 	    return new Promise(function (resolve, reject) {
 	      _client2.default.post(url, article).set('Authorization', 'Bearer ' + _AuthStore2.default.getJwt()).end(function (err, response) {
+	        if (err) reject(err);
+	        resolve(JSON.parse(response.text));
+	      });
+	    });
+	  },
+
+	  deleteArticle: function deleteArticle(url) {
+	    return new Promise(function (resolve, reject) {
+	      _client2.default.delete(url).set('Authorization', 'Bearer ' + _AuthStore2.default.getJwt()).end(function (err, response) {
 	        if (err) reject(err);
 	        resolve(JSON.parse(response.text));
 	      });
@@ -22978,6 +22999,8 @@
 	// Include React
 	var React = __webpack_require__(1);
 
+	var Results = __webpack_require__(181);
+
 	// Creating the Form component
 	var Form = React.createClass({
 	  displayName: "Form",
@@ -23031,7 +23054,7 @@
 	            "div",
 	            { className: "form-group" },
 	            React.createElement(
-	              "h4",
+	              "h5",
 	              { className: "" },
 	              React.createElement(
 	                "strong",
@@ -23049,7 +23072,7 @@
 	            }),
 	            React.createElement("br", null),
 	            React.createElement(
-	              "h4",
+	              "h5",
 	              { className: "" },
 	              React.createElement(
 	                "strong",
@@ -23066,7 +23089,7 @@
 	            }),
 	            React.createElement("br", null),
 	            React.createElement(
-	              "h4",
+	              "h5",
 	              { className: "" },
 	              React.createElement(
 	                "strong",
@@ -23091,7 +23114,8 @@
 	              "Submit"
 	            )
 	          )
-	        )
+	        ),
+	        React.createElement(Results, { articles: this.props.resultsArticles, setSaved: this.props.setSaved, setResults: this.props.setResults })
 	      )
 	    );
 	  }
@@ -23126,21 +23150,28 @@
 
 	    // Saves an article to the DB then gets the latest DB entires to refresh the saved Articles
 	    // callback is the "setSaved" function passed from Main.js
-	    saveArticle: function saveArticle(article, callback) {
-	        // helpers.postSaved(article)
-	        // .then(function() {
-	        //   helpers.getSaved().then(function(response){
-	        //     callback(response.data)
-	        //   })
-	        // })
+	    saveArticle: function saveArticle(article, results, setResults) {
 	        _ArticleActions2.default.saveArticle(article);
 	        _ArticleActions2.default.receiveArticles();
+	        var results = this.removeResultFromResults(article, results);
+	        setResults(results);
+	    },
+
+	    removeResultFromResults: function removeResultFromResults(article, results) {
+	        for (var i = 0; i < results.length; i++) {
+	            console.log("Results: " + results[i]);
+	            if (results[i].id == article.id) {
+	                results.splice(i, 1);
+	            }
+	        }
+	        return results;
 	    },
 
 	    // Here we render the function
 	    render: function render() {
 	        var self = this;
 	        var setSaved = this.props.setSaved;
+	        var setResults = this.props.setResults;
 	        return React.createElement(
 	            "div",
 	            { className: "panel panel-default" },
@@ -23165,33 +23196,38 @@
 	                            { className: "article row" },
 	                            React.createElement(
 	                                "div",
-	                                { className: "col-md-11 articleText" },
+	                                { className: "col-md-10 articleText text-left" },
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "Title: ",
 	                                    search.headline.main
 	                                ),
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "Date: ",
 	                                    search.pub_date
 	                                ),
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "URL: ",
-	                                    search.web_url
+	                                    React.createElement(
+	                                        "a",
+	                                        { href: search.web_url },
+	                                        search.web_url,
+	                                        " "
+	                                    )
 	                                )
 	                            ),
 	                            React.createElement(
 	                                "div",
-	                                { className: "col-md-1 articleButtons" },
+	                                { className: "col-md-2 articleButtons" },
 	                                React.createElement(
 	                                    "button",
 	                                    { onClick: function onClick() {
-	                                            return self.saveArticle(search, setSaved);
+	                                            return self.saveArticle(search, self.props.resultsArticles, setResults);
 	                                        }, className: "btn btn-primary" },
 	                                    "Save"
 	                                )
@@ -23254,22 +23290,8 @@
 	            // If we don't get any results, return an empty string
 	            return "";
 	        });
-	    },
-
-	    // This function hits our own server to retrieve the record of query results
-	    getSaved: function getSaved() {
-	        return axios.get("/api/saved");
-	    },
-
-	    // This function posts new searches to our database.
-	    postSaved: function postSaved(article) {
-	        return axios.post("/api/saved", { article: article });
-	    },
-
-	    // This function deletes saved articles.
-	    deleteSaved: function deleteSaved(articleID) {
-	        return axios.delete("/api/saved/" + articleID);
 	    }
+
 	};
 
 	// We export the API helper
@@ -24770,6 +24792,12 @@
 
 	"use strict";
 
+	var _ArticleActions = __webpack_require__(169);
+
+	var _ArticleActions2 = _interopRequireDefault(_ArticleActions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	// Include React
 	var React = __webpack_require__(1);
 
@@ -24782,17 +24810,14 @@
 
 
 	    deleteArticle: function deleteArticle(articleID, callback) {
-	        helpers.deleteSaved(articleID).then(function () {
-	            // THIS PROMISE IS NOT FUNCTIONING CORRECTLY
+	        // helpers.deleteSaved(articleID)
+	        // // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
+	        // helpers.getSaved().then(function(response) {
+	        //     callback(response.data);
+	        //   });
 
-	            // helpers.getSaved().then(function(response) {
-	            //     callback(response.data);
-	            // })
-	        });
-	        // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
-	        helpers.getSaved().then(function (response) {
-	            callback(response.data);
-	        });
+	        _ArticleActions2.default.deleteArticle(articleID);
+	        _ArticleActions2.default.receiveArticles();
 	    },
 
 	    // Here we describe this component's render method
@@ -24823,29 +24848,34 @@
 	                            { "data-id": search._id, className: "savedArticle row" },
 	                            React.createElement(
 	                                "div",
-	                                { className: "col-md-11 savedArticleText" },
+	                                { className: "col-md-10 savedArticleText" },
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "Title: ",
 	                                    search.title
 	                                ),
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "Date: ",
 	                                    search.date
 	                                ),
 	                                React.createElement(
-	                                    "h4",
+	                                    "p",
 	                                    null,
 	                                    "URL: ",
-	                                    search.url
+	                                    React.createElement(
+	                                        "a",
+	                                        { href: search.url },
+	                                        search.url,
+	                                        " "
+	                                    )
 	                                )
 	                            ),
 	                            React.createElement(
 	                                "div",
-	                                { className: "col-md-1 savedArticleButtons" },
+	                                { className: "col-md-2 savedArticleButtons" },
 	                                React.createElement(
 	                                    "button",
 	                                    { onClick: function onClick() {

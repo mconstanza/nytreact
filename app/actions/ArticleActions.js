@@ -28,14 +28,23 @@ export default {
       });
   },
 
-  saveArticle: (article) => {
+  saveArticle: (articleId) => {
     var user = JSON.parse(AuthStore.getUser());
     ArticlesAPI
-    .saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', article)
+    .saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId)
     .then(function(response) {
       console.log(response);
     })
 
+  },
+
+  deleteArticle: (articleId) => {
+    var user = JSON.parse(AuthStore.getUser());
+    ArticlesAPI
+    .deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId)
+    .then(function(response) {
+      console.log(response);
+    })
   },
 
   getArticle: (id) => {
