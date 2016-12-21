@@ -11,17 +11,29 @@ var helpers = require("./utils/helpers");
 
 // OAuth Configuration
 var config = require('../config/config.js');
+import AuthActions from '../actions/AuthActions';
+import AuthStore from '../stores/AuthStore';
 
 // Creating the Main component
 class AppComponent extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
 
     this.state = { searchTerm: "", searchStartYear: "", searchEndYear: "",
-             resultsArticles: [], savedArticles: [], authenticated: false};
+             resultsArticles: [], savedArticles: [], authenticated: AuthStore.isAuthenticated()};
+
+   // This function allows childrens to update the parent.
+   this.setTerm = (term) => {
+     this.setState({ searchTerm: term });
+   }
+
+   // This function allows the Results to update the Saved Articles
+   this.setSaved = (articles) => {
+     this.setState({ savedArticles: articles });
+   }
   }
 
   // The moment the page renders get the History
@@ -58,35 +70,30 @@ class AppComponent extends Component {
         alert(err);
         return;
       }
+      AuthActions.logUserIn(profile, token);
       this.setState({authenticated: true});
     });
   }
 
   logout() {
-    // AuthActions.logUserOut();
+    AuthActions.logUserOut();
     this.setState({authenticated: false});
   }
 
-  // This function allows childrens to update the parent.
-  setTerm(term) {
-    this.setState({ searchTerm: term });
-  }
 
-  // This function allows the Results to update the Saved Articles
-  setSaved(articles) {
-    this.setState({ savedArticles: articles });
-  }
 
   // Here we render the function
   render() {
     return (
       <div className="container">
         <div className="row">
-          <div className="jumbotron">
+          <div className="jumbotron text-center">
             <h2 className="text-center">NYT - React</h2>
             {!this.state.authenticated &&
-            <button onClick = {this.login} className = "btn btn-success">Login</button>
-          }
+            <button onClick = {this.login} className = "btn btn-success">Login</button>}
+            {this.state.authenticated &&
+            <button onClick = {this.logout} className = "btn btn-danger">Logout</button>}
+
           </div>
 
           <div className="row">

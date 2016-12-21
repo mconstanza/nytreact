@@ -91,7 +91,7 @@ app.get("/api/saved", function(req, res) {
 });
 
 // This route saves articles when the user clicks the 'save' button
-app.post("/api/saved", function(req, res) {
+app.post("/api/saved", authCheck, function(req, res) {
 
     console.log(req.body);
     Article.create({
@@ -108,7 +108,7 @@ app.post("/api/saved", function(req, res) {
 });
 
 // This route deletes articles when the user clicks the 'delete' button
-app.delete("/api/saved/:articleID", function(req, res) {
+app.delete("/api/saved/:articleID", authCheck, function(req, res) {
     // console.log(JSON.stringify(req.body));
     Article.findByIdAndRemove(mongoose.Types.ObjectId(req.params.articleID), function(err, article) {
       if (err) {
