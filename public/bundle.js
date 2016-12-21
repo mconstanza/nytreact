@@ -19895,14 +19895,24 @@
 	                    return;
 	                }
 	                _AuthActions2.default.logUserIn(profile, token);
-	                _this2.setState({ authenticated: true });
+	                _this2.setState({
+	                    authenticated: _AuthStore2.default.isAuthenticated(),
+	                    savedArticles: _ArticleStore2.default.getSavedArticles()
+	                });
 	            });
 	        }
 	    }, {
 	        key: "logout",
 	        value: function logout() {
 	            _AuthActions2.default.logUserOut();
-	            this.setState({ authenticated: false });
+	            this.setState({
+	                searchTerm: "",
+	                searchStartYear: "",
+	                searchEndYear: "",
+	                resultsArticles: [],
+	                savedArticles: [],
+	                authenticated: _AuthStore2.default.isAuthenticated()
+	            });
 	        }
 
 	        // Here we render the function
@@ -20493,6 +20503,13 @@
 	      return localStorage.getItem('profile');
 	    }
 	  }, {
+	    key: 'getUserId',
+	    value: function getUserId() {
+	      var user = localStorage.getItem('profile');
+	      var userId = user.email;
+	      return userId;
+	    }
+	  }, {
 	    key: 'getJwt',
 	    value: function getJwt() {
 	      return localStorage.getItem('id_token');
@@ -20857,12 +20874,18 @@
 
 	var _ArticlesAPI2 = _interopRequireDefault(_ArticlesAPI);
 
+	var _AuthStore = __webpack_require__(167);
+
+	var _AuthStore2 = _interopRequireDefault(_AuthStore);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = {
 
 	  receiveArticles: function receiveArticles() {
-	    _ArticlesAPI2.default.getSavedArticles('http://localhost:3000/api/saved').then(function (articles) {
+	    var user = JSON.parse(_AuthStore2.default.getUser());
+
+	    _ArticlesAPI2.default.getSavedArticles('http://localhost:3000/api/users/' + user.user_id + '/saved').then(function (articles) {
 	      console.log("articles in dispatch: " + JSON.stringify(articles));
 	      _AppDispatcher2.default.dispatch({
 	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLES,
@@ -20877,12 +20900,14 @@
 	  },
 
 	  saveArticle: function saveArticle(article) {
-	    _ArticlesAPI2.default.saveArticle('http://localhost:3000/api/saved', article).then(function (response) {
+	    var user = JSON.parse(_AuthStore2.default.getUser());
+	    _ArticlesAPI2.default.saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', article).then(function (response) {
 	      console.log(response);
 	    });
 	  },
 
 	  getArticle: function getArticle(id) {
+	    var user = JSON.parse(_AuthStore2.default.getUser());
 	    _ArticlesAPI2.default.getArticle('http://localhost:3000/api/saved/' + id).then(function (article) {
 	      _AppDispatcher2.default.dispatch({
 	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLE,
@@ -23109,9 +23134,7 @@
 	        //   })
 	        // })
 	        _ArticleActions2.default.saveArticle(article);
-	        _ArticleActions2.default.receiveArticles(function (response) {
-	            callback(response.articles);
-	        });
+	        _ArticleActions2.default.receiveArticles();
 	    },
 
 	    // Here we render the function

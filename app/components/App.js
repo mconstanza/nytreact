@@ -96,13 +96,23 @@ class AppComponent extends Component {
                 return;
             }
             AuthActions.logUserIn(profile, token);
-            this.setState({authenticated: true});
+            this.setState({
+                authenticated: AuthStore.isAuthenticated(),
+                savedArticles: ArticleStore.getSavedArticles()
+            });
         });
     }
 
     logout() {
         AuthActions.logUserOut();
-        this.setState({authenticated: false});
+        this.setState({
+            searchTerm: "",
+            searchStartYear: "",
+            searchEndYear: "",
+            resultsArticles: [],
+            savedArticles: [],
+            authenticated: AuthStore.isAuthenticated()
+        });
     }
 
     // Here we render the function

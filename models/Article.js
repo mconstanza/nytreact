@@ -6,12 +6,12 @@ var ArticleSchema = new Schema({
 
   title: {
     type: String,
-    required: true
+    // required: true
   },
 
   date: {
     type: Date,
-    required: true
+    // required: true
   },
 
   url: {
@@ -19,8 +19,7 @@ var ArticleSchema = new Schema({
   },
 
   user: {
-    type: Schema.Types.ObjectId,
-    ref: "User"
+    type: String
   }
 },
 {

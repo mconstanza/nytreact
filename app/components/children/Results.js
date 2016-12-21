@@ -18,10 +18,8 @@ var Results = React.createClass({
             //   })
             // })
             ArticleActions.saveArticle(article);
-            ArticleActions.receiveArticles(function(response) {
-                callback(response.articles);
-            });
-        } ,
+            ArticleActions.receiveArticles();
+        },
 
     // Here we render the function
     render : function() {
