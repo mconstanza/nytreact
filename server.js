@@ -93,11 +93,11 @@ app.get("/api/saved", function(req, res) {
 // This route saves articles when the user clicks the 'save' button
 app.post("/api/saved", authCheck, function(req, res) {
 
-    console.log(req.body);
+    console.log('Req body: ' + JSON.stringify(req.body));
     Article.create({
-        title: req.body.article.headline.main,
-        date: req.body.article.pub_date,
-        url: req.body.article.web_url
+        title: req.body.headline.main,
+        date: req.body.pub_date,
+        url: req.body.web_url
     }, function(err) {
         if (err) {
             console.log(err);

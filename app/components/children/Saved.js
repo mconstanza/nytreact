@@ -2,7 +2,7 @@
 var React = require("react");
 
 // Helper for making AJAX requests to our API
-var helpers = require("../utils/helpers");
+var helpers = require("../../utils/helpers");
 
 // This is the History component. It will be used to show a log of  recent searches.
 var Saved = React.createClass({
