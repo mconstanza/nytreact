@@ -10,12 +10,6 @@ import ArticleActions from '../../actions/ArticleActions';
 var Saved = React.createClass({
 
     deleteArticle: function(articleID, callback) {
-        // helpers.deleteSaved(articleID)
-        // // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
-        // helpers.getSaved().then(function(response) {
-        //     callback(response.data);
-        //   });
-
         ArticleActions.deleteArticle(articleID);
         ArticleActions.receiveArticles();
     },
@@ -23,11 +17,16 @@ var Saved = React.createClass({
     render: function() {
         var self = this;
         var setSaved = this.props.setSaved;
+
+        var headingStyle = {
+                fontFamily: 'Julius Sans One'
+        }
+
         return (
 
-            <div className="panel panel-default">
+            <div className="panel panel-default" style={headingStyle}>
                 <div className="panel-heading">
-                    <h3 className="panel-title text-center">Saved Articles</h3>
+                    <h3 className="panel-title text-center"><strong>Saved Articles</strong></h3>
                 </div>
                 <div className="panel-body">
 
@@ -42,7 +41,7 @@ var Saved = React.createClass({
                                         <p>URL: <a href={search.url}>{search.url} </a></p>
                                     </div>
                                     <div className="col-md-2 savedArticleButtons">
-                                        <button onClick={() => self.deleteArticle(search._id, setSaved)} className="btn btn-primary">Delete</button>
+                                        <button onClick={() => self.deleteArticle(search._id, setSaved)} className="btn btn-danger">Remove</button>
                                     </div>
                                 </div>
                                 <hr/>

@@ -33,10 +33,15 @@ var Results = React.createClass({
         var self = this;
         var setSaved = this.props.setSaved;
         var setResults = this.props.setResults;
+
+        var headingStyle = {
+                fontFamily: 'Julius Sans One'
+        }
+
         return (
-            <div className="panel panel-default">
+            <div className="panel panel-default" style={headingStyle}>
                 <div className="panel-heading">
-                    <h2 className="panel-title text-center">Results</h2>
+                    <h2 className="panel-title text-center"><strong>Results</strong></h2>
                 </div>
                 <div className="panel-body">
 

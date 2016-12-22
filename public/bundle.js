@@ -23003,122 +23003,117 @@
 
 	// Creating the Form component
 	var Form = React.createClass({
-	  displayName: "Form",
+	    displayName: "Form",
 
 
-	  // Here we set a generic state associated with the text being searched for
-	  getInitialState: function getInitialState() {
-	    return { topic: "",
-	      startYear: "",
-	      endYear: ""
-	    };
-	  },
+	    // Here we set a generic state associated with the text being searched for
+	    getInitialState: function getInitialState() {
+	        return { topic: "", startYear: "", endYear: "" };
+	    },
 
-	  // This function will respond to the user input
-	  handleChange: function handleChange(event) {
+	    // This function will respond to the user input
+	    handleChange: function handleChange(event) {
+	        console.log(event.currentTarget.id);
 
-	    this.setState({ topic: event.target.value });
-	  },
+	        switch (event.target.id) {
+	            case "topic":
+	                this.setState({ topic: event.target.value });
+	                break;
+	            case "startYear":
+	                this.setState({ startYear: event.target.value });
+	                break;
+	            case "endYear":
+	                this.setState({ endYear: event.target.value });
+	                break;
+	        }
+	    },
 
-	  // When a user submits...
-	  handleSubmit: function handleSubmit(event) {
-	    // prevent the HTML from trying to submit a form if the user hits "Enter" instead of
-	    // clicking the button
-	    event.preventDefault();
+	    // When a user submits...
+	    handleSubmit: function handleSubmit(event) {
+	        // prevent the HTML from trying to submit a form if the user hits "Enter" instead of
+	        // clicking the button
+	        event.preventDefault();
 
-	    // Set the parent to have the search term
-	    this.props.setTerm(this.state.topic);
-	    this.setState({ topic: "" });
-	  },
-	  // Here we describe this component's render method
-	  render: function render() {
-	    return React.createElement(
-	      "div",
-	      { className: "panel panel-default" },
-	      React.createElement(
-	        "div",
-	        { className: "panel-heading" },
-	        React.createElement(
-	          "h3",
-	          { className: "panel-title text-center" },
-	          "Search"
-	        )
-	      ),
-	      React.createElement(
-	        "div",
-	        { className: "panel-body text-center" },
-	        React.createElement(
-	          "form",
-	          { onSubmit: this.handleSubmit },
-	          React.createElement(
+	        // Set the parent to have the search term
+	        this.props.setTerm(this.state.topic);
+	        this.setState({ topic: "" });
+	    },
+	    // Here we describe this component's render method
+	    render: function render() {
+
+	        var headingStyle = {
+	            fontFamily: 'Julius Sans One'
+	        };
+
+	        return React.createElement(
 	            "div",
-	            { className: "form-group" },
+	            { className: "panel panel-default", style: headingStyle },
 	            React.createElement(
-	              "h5",
-	              { className: "" },
-	              React.createElement(
-	                "strong",
-	                null,
-	                "Article Topic"
-	              )
+	                "div",
+	                { className: "panel-heading" },
+	                React.createElement(
+	                    "h3",
+	                    { className: "panel-title text-center" },
+	                    React.createElement(
+	                        "strong",
+	                        null,
+	                        "Search"
+	                    )
+	                )
 	            ),
-	            React.createElement("input", {
-	              value: this.state.topic,
-	              type: "text",
-	              className: "form-control text-center",
-	              id: "topic",
-	              onChange: this.handleChange,
-	              required: true
-	            }),
-	            React.createElement("br", null),
 	            React.createElement(
-	              "h5",
-	              { className: "" },
-	              React.createElement(
-	                "strong",
-	                null,
-	                "Start Year"
-	              )
-	            ),
-	            React.createElement("input", {
-	              value: this.state.startYear,
-	              type: "text",
-	              className: "form-control text-center",
-	              id: "startYear",
-	              onChange: this.handleChange
-	            }),
-	            React.createElement("br", null),
-	            React.createElement(
-	              "h5",
-	              { className: "" },
-	              React.createElement(
-	                "strong",
-	                null,
-	                "End Year"
-	              )
-	            ),
-	            React.createElement("input", {
-	              value: this.state.endYear,
-	              type: "text",
-	              className: "form-control text-center",
-	              id: "endYear",
-	              onChange: this.handleChange
-	            }),
-	            React.createElement("br", null),
-	            React.createElement(
-	              "button",
-	              {
-	                className: "btn btn-primary",
-	                type: "submit"
-	              },
-	              "Submit"
+	                "div",
+	                { className: "panel-body text-center" },
+	                React.createElement(
+	                    "form",
+	                    { onSubmit: this.handleSubmit },
+	                    React.createElement(
+	                        "div",
+	                        { className: "form-group" },
+	                        React.createElement(
+	                            "h5",
+	                            { className: "" },
+	                            React.createElement(
+	                                "strong",
+	                                null,
+	                                "Article Topic"
+	                            )
+	                        ),
+	                        React.createElement("input", { value: this.state.topic, type: "text", className: "form-control text-center", id: "topic", onChange: this.handleChange, required: true }),
+	                        React.createElement("br", null),
+	                        React.createElement(
+	                            "h5",
+	                            { className: "" },
+	                            React.createElement(
+	                                "strong",
+	                                null,
+	                                "Start Year"
+	                            )
+	                        ),
+	                        React.createElement("input", { value: this.state.startYear, type: "text", className: "form-control text-center", id: "startYear", onChange: this.handleChange }),
+	                        React.createElement("br", null),
+	                        React.createElement(
+	                            "h5",
+	                            { className: "" },
+	                            React.createElement(
+	                                "strong",
+	                                null,
+	                                "End Year"
+	                            )
+	                        ),
+	                        React.createElement("input", { value: this.state.endYear, type: "text", className: "form-control text-center", id: "endYear", onChange: this.handleChange }),
+	                        React.createElement("br", null),
+	                        React.createElement(
+	                            "button",
+	                            { className: "btn btn-primary", type: "submit" },
+	                            "Submit"
+	                        )
+	                    )
+	                ),
+	                React.createElement(Results, { articles: this.props.resultsArticles, setSaved: this.props.setSaved, setResults: this.props.setResults })
 	            )
-	          )
-	        ),
-	        React.createElement(Results, { articles: this.props.resultsArticles, setSaved: this.props.setSaved, setResults: this.props.setResults })
-	      )
-	    );
-	  }
+	        );
+	    }
 	});
 
 	// Export the component back for use in other files
@@ -23172,16 +23167,25 @@
 	        var self = this;
 	        var setSaved = this.props.setSaved;
 	        var setResults = this.props.setResults;
+
+	        var headingStyle = {
+	            fontFamily: 'Julius Sans One'
+	        };
+
 	        return React.createElement(
 	            "div",
-	            { className: "panel panel-default" },
+	            { className: "panel panel-default", style: headingStyle },
 	            React.createElement(
 	                "div",
 	                { className: "panel-heading" },
 	                React.createElement(
 	                    "h2",
 	                    { className: "panel-title text-center" },
-	                    "Results"
+	                    React.createElement(
+	                        "strong",
+	                        null,
+	                        "Results"
+	                    )
 	                )
 	            ),
 	            React.createElement(
@@ -24810,12 +24814,6 @@
 
 
 	    deleteArticle: function deleteArticle(articleID, callback) {
-	        // helpers.deleteSaved(articleID)
-	        // // This happens to work fast enough that it doesn't matter, but why doesn't it work in promise?
-	        // helpers.getSaved().then(function(response) {
-	        //     callback(response.data);
-	        //   });
-
 	        _ArticleActions2.default.deleteArticle(articleID);
 	        _ArticleActions2.default.receiveArticles();
 	    },
@@ -24824,16 +24822,25 @@
 	    render: function render() {
 	        var self = this;
 	        var setSaved = this.props.setSaved;
+
+	        var headingStyle = {
+	            fontFamily: 'Julius Sans One'
+	        };
+
 	        return React.createElement(
 	            "div",
-	            { className: "panel panel-default" },
+	            { className: "panel panel-default", style: headingStyle },
 	            React.createElement(
 	                "div",
 	                { className: "panel-heading" },
 	                React.createElement(
 	                    "h3",
 	                    { className: "panel-title text-center" },
-	                    "Saved Articles"
+	                    React.createElement(
+	                        "strong",
+	                        null,
+	                        "Saved Articles"
+	                    )
 	                )
 	            ),
 	            React.createElement(
@@ -24880,8 +24887,8 @@
 	                                    "button",
 	                                    { onClick: function onClick() {
 	                                            return self.deleteArticle(search._id, setSaved);
-	                                        }, className: "btn btn-primary" },
-	                                    "Delete"
+	                                        }, className: "btn btn-danger" },
+	                                    "Remove"
 	                                )
 	                            )
 	                        ),
