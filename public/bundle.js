@@ -19790,13 +19790,13 @@
 	// Here we include all of the sub-components
 	var Form = __webpack_require__(180);
 	var Results = __webpack_require__(181);
-	var Saved = __webpack_require__(208);
+	var Saved = __webpack_require__(209);
 
 	// Helper for making AJAX requests to our API
 	var helpers = __webpack_require__(182);
 
 	// OAuth Configuration
-	var config = __webpack_require__(209);
+	var config = __webpack_require__(208);
 
 	// Flux Architecture
 
@@ -19845,11 +19845,7 @@
 	    _createClass(AppComponent, [{
 	        key: "componentDidMount",
 	        value: function componentDidMount() {
-	            // helpers.getSaved().then(function(response){
-	            //   if(response !== this.state.savedArticles){
-	            //     this.setState({savedArticles: response.data});
-	            //   }
-	            // }.bind(this));
+
 	            _ArticleActions2.default.receiveArticles();
 	        }
 	    }, {
@@ -19866,6 +19862,7 @@
 	    }, {
 	        key: "onChange",
 	        value: function onChange() {
+
 	            this.setState({ savedArticles: _ArticleStore2.default.getSavedArticles() });
 	        }
 
@@ -19897,7 +19894,8 @@
 	                    return;
 	                }
 	                _AuthActions2.default.logUserIn(profile, token);
-	                _this2.setState({ authenticated: _AuthStore2.default.isAuthenticated(), savedArticles: _ArticleStore2.default.getSavedArticles() });
+	                _this2.setState({ authenticated: _AuthStore2.default.isAuthenticated() });
+	                _this2.setState({ savedArticles: _ArticleActions2.default.receiveArticles() });
 	            });
 	        }
 	    }, {
@@ -19921,28 +19919,37 @@
 	        value: function render() {
 
 	            var headingStyle = {
-
 	                fontFamily: 'Julius Sans One'
+	            };
 
+	            var jumboStyle = {
+	                background: 'transparent'
 	            };
 	            return _react2.default.createElement(
 	                "div",
-	                { className: "container" },
+	                { className: "container", style: headingStyle },
 	                _react2.default.createElement(
 	                    "div",
 	                    { className: "row" },
 	                    _react2.default.createElement(
 	                        "div",
-	                        { className: "jumbotron text-center" },
+	                        { style: jumboStyle, className: "jumbotron text-center" },
 	                        _react2.default.createElement(
 	                            "h2",
-	                            { style: headingStyle, className: "text-center" },
+	                            { className: "text-center" },
 	                            "NYT - React"
 	                        ),
+	                        _react2.default.createElement(
+	                            "p",
+	                            null,
+	                            "Search for and save articles from the New York Times"
+	                        ),
+	                        _react2.default.createElement("hr", null),
+	                        " ",
 	                        !this.state.authenticated && _react2.default.createElement(
 	                            "button",
 	                            { onClick: this.login, className: "btn btn-success" },
-	                            "Login"
+	                            "Login/Signup"
 	                        ),
 	                        this.state.authenticated && _react2.default.createElement(
 	                            "button",
@@ -19956,12 +19963,12 @@
 	                        _react2.default.createElement(
 	                            "div",
 	                            { className: "col-md-6" },
-	                            _react2.default.createElement(Form, { setTerm: this.setTerm, resultsArticles: this.state.resultsArticles, setSaved: this.setSaved, setResults: this.setResults })
+	                            _react2.default.createElement(Form, { authenticated: this.state.authenticated, setTerm: this.setTerm, resultsArticles: this.state.resultsArticles, setSaved: this.setSaved, setResults: this.setResults })
 	                        ),
 	                        _react2.default.createElement(
 	                            "div",
 	                            { className: "col-md-6" },
-	                            _react2.default.createElement(Saved, { savedArticles: this.state.savedArticles, setSaved: this.setSaved }),
+	                            _react2.default.createElement(Saved, { authenticated: this.state.authenticated, savedArticles: this.state.savedArticles, setSaved: this.setSaved }),
 	                            " "
 	                        )
 	                    )
@@ -20508,13 +20515,6 @@
 	      return localStorage.getItem('profile');
 	    }
 	  }, {
-	    key: 'getUserId',
-	    value: function getUserId() {
-	      var user = localStorage.getItem('profile');
-	      var userId = user.email;
-	      return userId;
-	    }
-	  }, {
 	    key: 'getJwt',
 	    value: function getJwt() {
 	      return localStorage.getItem('id_token');
@@ -20891,7 +20891,7 @@
 	    var user = JSON.parse(_AuthStore2.default.getUser());
 
 	    _ArticlesAPI2.default.getSavedArticles('http://localhost:3000/api/users/' + user.user_id + '/saved').then(function (articles) {
-	      console.log("articles in dispatch: " + JSON.stringify(articles));
+	      // console.log("articles in dispatch: " + JSON.stringify(articles))
 	      _AppDispatcher2.default.dispatch({
 	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLES,
 	        articles: articles
@@ -23036,7 +23036,7 @@
 
 	        // Set the parent to have the search term
 	        this.props.setTerm(this.state.topic);
-	        this.setState({ topic: "" });
+	        this.setState({ topic: "", startYear: "", endYear: "" });
 	    },
 	    // Here we describe this component's render method
 	    render: function render() {
@@ -23110,7 +23110,7 @@
 	                        )
 	                    )
 	                ),
-	                React.createElement(Results, { articles: this.props.resultsArticles, setSaved: this.props.setSaved, setResults: this.props.setResults })
+	                React.createElement(Results, { authenticated: this.props.authenticated, articles: this.props.resultsArticles, setSaved: this.props.setSaved })
 	            )
 	        );
 	    }
@@ -23145,28 +23145,15 @@
 
 	    // Saves an article to the DB then gets the latest DB entires to refresh the saved Articles
 	    // callback is the "setSaved" function passed from Main.js
-	    saveArticle: function saveArticle(article, results, setResults) {
+	    saveArticle: function saveArticle(article) {
 	        _ArticleActions2.default.saveArticle(article);
 	        _ArticleActions2.default.receiveArticles();
-	        var results = this.removeResultFromResults(article, results);
-	        setResults(results);
-	    },
-
-	    removeResultFromResults: function removeResultFromResults(article, results) {
-	        for (var i = 0; i < results.length; i++) {
-	            console.log("Results: " + results[i]);
-	            if (results[i].id == article.id) {
-	                results.splice(i, 1);
-	            }
-	        }
-	        return results;
 	    },
 
 	    // Here we render the function
 	    render: function render() {
 	        var self = this;
 	        var setSaved = this.props.setSaved;
-	        var setResults = this.props.setResults;
 
 	        var headingStyle = {
 	            fontFamily: 'Julius Sans One'
@@ -23186,11 +23173,16 @@
 	                        null,
 	                        "Results"
 	                    )
+	                ),
+	                !self.props.authenticated && React.createElement(
+	                    "p",
+	                    null,
+	                    "Login to save results"
 	                )
 	            ),
 	            React.createElement(
 	                "div",
-	                { className: "panel-body" },
+	                { className: "panel-body", id: "resultsBody" },
 	                this.props.articles.map(function (search, i) {
 	                    return React.createElement(
 	                        "div",
@@ -23204,22 +23196,37 @@
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "Title: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "Title:"
+	                                    ),
+	                                    " ",
 	                                    search.headline.main
 	                                ),
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "Date: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "Date:"
+	                                    ),
+	                                    " ",
 	                                    search.pub_date
 	                                ),
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "URL: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "URL:"
+	                                    ),
+	                                    " ",
 	                                    React.createElement(
 	                                        "a",
-	                                        { href: search.web_url },
+	                                        { target: "blank", href: search.web_url },
 	                                        search.web_url,
 	                                        " "
 	                                    )
@@ -23228,10 +23235,10 @@
 	                            React.createElement(
 	                                "div",
 	                                { className: "col-md-2 articleButtons" },
-	                                React.createElement(
+	                                self.props.authenticated && React.createElement(
 	                                    "button",
 	                                    { onClick: function onClick() {
-	                                            return self.saveArticle(search, self.props.resultsArticles, setResults);
+	                                            return self.saveArticle(search);
 	                                        }, className: "btn btn-primary" },
 	                                    "Save"
 	                                )
@@ -23257,13 +23264,15 @@
 	// Include the axios package for performing HTTP requests (promise based alternative to request)
 	var axios = __webpack_require__(183);
 
+	var config = __webpack_require__(208);
+
 	// NY-Times API
-	var NYTAPI = "5063f54818154873afa3996286e1b391";
+	var NYTAPI = config.NYTAPI;
 
 	// Helper functions for making API Calls
 	var helpers = {
 
-	    // This function serves our purpose of running the query to geolocate.
+	    // Get NYT Articles
 	    runQuery: function runQuery(topic, startYear, endYear) {
 
 	        var queryTopic = topic;
@@ -23271,8 +23280,6 @@
 	        var queryEndYear = endYear;
 
 	        console.log(queryTopic, queryStartYear, queryEndYear);
-
-	        // Get the articles from NYT
 
 	        var queryURLBase = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + NYTAPI + "&q=";
 	        var queryURL = queryURLBase + queryTopic;
@@ -23295,7 +23302,6 @@
 	            return "";
 	        });
 	    }
-
 	};
 
 	// We export the API helper
@@ -24792,6 +24798,22 @@
 
 /***/ },
 /* 208 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var config = {
+	  domain: 'mconstanza.auth0.com',
+	  auth0Secret: 'SsoEWeTp4FZUNLSOkeviipqq39eAS9mtmHaIz3vhDj098-AA0GTgpcm_CD3ofm4-',
+	  auth0ClientId: 'hFHhbzhvUj6iii7amGNQs1Uxf7EhxFxI',
+	  NYTAPI: "5063f54818154873afa3996286e1b391"
+
+	};
+
+	module.exports = config;
+
+/***/ },
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24827,6 +24849,11 @@
 	            fontFamily: 'Julius Sans One'
 	        };
 
+	        var savedBody = {
+	            maxHeight: 800,
+	            overflowY: "scroll"
+	        };
+
 	        return React.createElement(
 	            "div",
 	            { className: "panel panel-default", style: headingStyle },
@@ -24845,8 +24872,8 @@
 	            ),
 	            React.createElement(
 	                "div",
-	                { className: "panel-body" },
-	                this.props.savedArticles.map(function (search, i) {
+	                { style: savedBody, className: "panel-body" },
+	                this.props.savedArticles && this.props.savedArticles.map(function (search, i) {
 	                    return React.createElement(
 	                        "div",
 	                        { key: i },
@@ -24859,22 +24886,37 @@
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "Title: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "Title:"
+	                                    ),
+	                                    " ",
 	                                    search.title
 	                                ),
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "Date: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "Date:"
+	                                    ),
+	                                    " ",
 	                                    search.date
 	                                ),
 	                                React.createElement(
 	                                    "p",
 	                                    null,
-	                                    "URL: ",
+	                                    React.createElement(
+	                                        "strong",
+	                                        null,
+	                                        "URL:"
+	                                    ),
+	                                    " ",
 	                                    React.createElement(
 	                                        "a",
-	                                        { href: search.url },
+	                                        { target: "blank", href: search.url },
 	                                        search.url,
 	                                        " "
 	                                    )
@@ -24888,7 +24930,7 @@
 	                                    { onClick: function onClick() {
 	                                            return self.deleteArticle(search._id, setSaved);
 	                                        }, className: "btn btn-danger" },
-	                                    "Remove"
+	                                    "Delete"
 	                                )
 	                            )
 	                        ),
@@ -24902,21 +24944,6 @@
 
 	// Export the component back for use in other files
 	module.exports = Saved;
-
-/***/ },
-/* 209 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var config = {
-	  domain: 'mconstanza.auth0.com',
-	  auth0Secret: 'SsoEWeTp4FZUNLSOkeviipqq39eAS9mtmHaIz3vhDj098-AA0GTgpcm_CD3ofm4-',
-	  auth0ClientId: 'hFHhbzhvUj6iii7amGNQs1Uxf7EhxFxI'
-
-	};
-
-	module.exports = config;
 
 /***/ }
 /******/ ]);

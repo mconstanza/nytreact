@@ -80,7 +80,7 @@ app.get("/", function(req, res) {
 app.get("/api/users/:userId/saved", authCheck, function(req, res) {
     Article.find({'user': req.params.userId}).sort([
         ["createdAt", "descending"]
-    ]).limit(5).exec(function(err, doc) {
+    ]).exec(function(err, doc) {
         if (err) {
             console.log(err);
         } else {

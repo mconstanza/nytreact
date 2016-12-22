@@ -54,11 +54,7 @@ class AppComponent extends Component {
 
     // The moment the page renders get the History
     componentDidMount() {
-        // helpers.getSaved().then(function(response){
-        //   if(response !== this.state.savedArticles){
-        //     this.setState({savedArticles: response.data});
-        //   }
-        // }.bind(this));
+
         ArticleActions.receiveArticles()
 
     }
@@ -73,6 +69,7 @@ class AppComponent extends Component {
     }
 
     onChange() {
+
         this.setState({savedArticles: ArticleStore.getSavedArticles()});
     }
 
@@ -97,9 +94,11 @@ class AppComponent extends Component {
                 alert(err);
                 return;
             }
-            AuthActions.logUserIn(profile, token);
-            this.setState({authenticated: AuthStore.isAuthenticated(), savedArticles: ArticleStore.getSavedArticles()});
-        });
+            AuthActions.logUserIn(profile, token)
+            this.setState({authenticated: AuthStore.isAuthenticated()})
+            this.setState({savedArticles: ArticleActions.receiveArticles()})
+
+        })
     }
 
     logout() {
@@ -118,16 +117,19 @@ class AppComponent extends Component {
     render() {
 
         var headingStyle = {
+            fontFamily: 'Julius Sans One'
+        }
 
-                fontFamily: 'Julius Sans One'
-
+        var jumboStyle = {
+            background: 'transparent'
         }
         return (
-            <div className="container">
+            <div className="container" style={headingStyle}>
                 <div className="row">
-                    <div className="jumbotron text-center">
-                        <h2 style={headingStyle} className="text-center">NYT - React</h2>
-                        {!this.state.authenticated && <button onClick={this.login} className="btn btn-success">Login</button>}
+                    <div style={jumboStyle} className="jumbotron text-center">
+                        <h2 className="text-center">NYT - React</h2>
+                        <p>Search for and save articles from the New York Times</p>
+                        <hr/> {!this.state.authenticated && <button onClick={this.login} className="btn btn-success">Login/Signup</button>}
                         {this.state.authenticated && <button onClick={this.logout} className="btn btn-danger">Logout</button>}
 
                     </div>
@@ -135,22 +137,16 @@ class AppComponent extends Component {
                     <div className="row">
 
                         <div className="col-md-6">
-                            <Form setTerm={this.setTerm} resultsArticles={this.state.resultsArticles} setSaved={this.setSaved} setResults={this.setResults}/>
+                            <Form authenticated={this.state.authenticated} setTerm={this.setTerm} resultsArticles={this.state.resultsArticles} setSaved={this.setSaved} setResults={this.setResults}/>
                         </div>
 
                         <div className="col-md-6">
-                            <Saved savedArticles={this.state.savedArticles} setSaved={this.setSaved}/> {/* <Results articles={this.state.resultsArticles} setSaved={this.setSaved}/> */}
+                            <Saved authenticated={this.state.authenticated} savedArticles={this.state.savedArticles} setSaved={this.setSaved}/> {/* <Results articles={this.state.resultsArticles} setSaved={this.setSaved}/> */}
 
                         </div>
                     </div>
 
                 </div>
-
-                {/* <div className="row">
-
-
-
-                </div> */}
 
             </div>
         );

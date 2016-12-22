@@ -14,7 +14,7 @@ export default {
     ArticlesAPI
       .getSavedArticles('http://localhost:3000/api/users/' + user.user_id +'/saved')
       .then(articles => {
-        console.log("articles in dispatch: " + JSON.stringify(articles))
+        // console.log("articles in dispatch: " + JSON.stringify(articles))
         AppDispatcher.dispatch({
           actionType: ArticleConstants.RECEIVE_ARTICLES,
           articles: articles

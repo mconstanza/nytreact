@@ -1,13 +1,15 @@
 // Include the axios package for performing HTTP requests (promise based alternative to request)
 var axios = require("axios");
 
+var config = require('../config/config.js');
+
 // NY-Times API
-var NYTAPI = "5063f54818154873afa3996286e1b391";
+var NYTAPI = config.NYTAPI;
 
 // Helper functions for making API Calls
 var helpers = {
 
-    // This function serves our purpose of running the query to geolocate.
+    // Get NYT Articles
     runQuery: function(topic, startYear, endYear) {
 
         var queryTopic = topic;
@@ -15,8 +17,6 @@ var helpers = {
         var queryEndYear = endYear;
 
         console.log(queryTopic, queryStartYear, queryEndYear);
-
-        // Get the articles from NYT
 
         var queryURLBase = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + NYTAPI + "&q=";
         var queryURL = queryURLBase + queryTopic;
@@ -38,22 +38,7 @@ var helpers = {
             // If we don't get any results, return an empty string
             return "";
         });
-    },
-
-    // This function hits our own server to retrieve the record of query results
-    // getSaved: function() {
-    //     return axios.get("/api/saved");
-    // },
-    //
-    // // This function posts new searches to our database.
-    // postSaved: function(article) {
-    //     return axios.post("/api/saved", {article: article});
-    // },
-    //
-    // // This function deletes saved articles.
-    // deleteSaved: function(articleID) {
-    //   return axios.delete("/api/saved/" + articleID);
-    // }
+    }
 };
 
 // We export the API helper

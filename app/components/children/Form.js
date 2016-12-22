@@ -36,7 +36,7 @@ var Form = React.createClass({
 
         // Set the parent to have the search term
         this.props.setTerm(this.state.topic);
-        this.setState({topic: ""});
+        this.setState({topic: "", startYear: "", endYear: ""});
     },
     // Here we describe this component's render method
     render: function() {
@@ -81,7 +81,7 @@ var Form = React.createClass({
                             </button>
                         </div>
                     </form>
-                    <Results articles={this.props.resultsArticles} setSaved={this.props.setSaved} setResults={this.props.setResults}/>
+                    <Results authenticated={this.props.authenticated} articles={this.props.resultsArticles} setSaved={this.props.setSaved}/>
                 </div>
 
             </div>

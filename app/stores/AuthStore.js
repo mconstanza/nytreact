@@ -40,12 +40,6 @@ class AuthStoreClass extends EventEmitter {
     return localStorage.getItem('profile');
   }
 
-  getUserId() {
-    var user = localStorage.getItem('profile');
-    var userId = user.email;
-    return userId;
-  }
-
   getJwt() {
     return localStorage.getItem('id_token');
   }
