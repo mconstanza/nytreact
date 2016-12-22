@@ -20890,7 +20890,13 @@
 	  receiveArticles: function receiveArticles() {
 	    var user = JSON.parse(_AuthStore2.default.getUser());
 
-	    _ArticlesAPI2.default.getSavedArticles('http://localhost:3000/api/users/' + user.user_id + '/saved').then(function (articles) {
+	    _ArticlesAPI2.default
+	    // .getSavedArticles('http://localhost:3000/api/users/' + user.user_id +'/saved')
+
+	    // .saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId)
+
+	    // .deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId)
+	    .getSavedArticles('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id + '/saved').then(function (articles) {
 	      // console.log("articles in dispatch: " + JSON.stringify(articles))
 	      _AppDispatcher2.default.dispatch({
 	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLES,
@@ -20906,33 +20912,17 @@
 
 	  saveArticle: function saveArticle(articleId) {
 	    var user = JSON.parse(_AuthStore2.default.getUser());
-	    _ArticlesAPI2.default.saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId).then(function (response) {
+	    _ArticlesAPI2.default.saveArticle('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id + '/saved', articleId).then(function (response) {
 	      console.log(response);
 	    });
 	  },
 
 	  deleteArticle: function deleteArticle(articleId) {
 	    var user = JSON.parse(_AuthStore2.default.getUser());
-	    _ArticlesAPI2.default.deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId).then(function (response) {
+	    _ArticlesAPI2.default.deleteArticle('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id + '/saved/' + articleId).then(function (response) {
 	      console.log(response);
 	    });
-	  },
-
-	  getArticle: function getArticle(id) {
-	    var user = JSON.parse(_AuthStore2.default.getUser());
-	    _ArticlesAPI2.default.getArticle('http://localhost:3000/api/saved/' + id).then(function (article) {
-	      _AppDispatcher2.default.dispatch({
-	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLE,
-	        article: article
-	      });
-	    }).catch(function (message) {
-	      _AppDispatcher2.default.dispatch({
-	        actionType: _ArticleConstants2.default.RECEIVE_ARTICLE_ERROR,
-	        message: message
-	      });
-	    });
 	  }
-
 	};
 
 /***/ },
