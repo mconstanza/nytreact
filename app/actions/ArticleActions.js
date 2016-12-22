@@ -12,7 +12,8 @@ export default {
     var user = JSON.parse(AuthStore.getUser());
 
     ArticlesAPI
-      .getSavedArticles('http://localhost:3000/api/users/' + user.user_id +'/saved')
+      // .getSavedArticles('http://localhost:3000/api/users/' + user.user_id +'/saved')
+      .getSavedArticles('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id +'/saved')
       .then(articles => {
         // console.log("articles in dispatch: " + JSON.stringify(articles))
         AppDispatcher.dispatch({
@@ -31,7 +32,8 @@ export default {
   saveArticle: (articleId) => {
     var user = JSON.parse(AuthStore.getUser());
     ArticlesAPI
-    .saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId)
+    // .saveArticle('http://localhost:3000/api/users/' + user.user_id + '/saved', articleId)
+    .saveArticle('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id + '/saved', articleId)
     .then(function(response) {
       console.log(response);
     })
@@ -41,28 +43,10 @@ export default {
   deleteArticle: (articleId) => {
     var user = JSON.parse(AuthStore.getUser());
     ArticlesAPI
-    .deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId)
+    // .deleteArticle('http://localhost:3000/api/users/' + user.user_id + '/saved/' + articleId)
+    .deleteArticle('https://nyt-reaction.herokuapp.com/api/users/' + user.user_id + '/saved/' + articleId)
     .then(function(response) {
       console.log(response);
     })
-  },
-
-  getArticle: (id) => {
-    var user = JSON.parse(AuthStore.getUser());
-    ArticlesAPI
-      .getArticle('http://localhost:3000/api/saved/' + id)
-      .then(article => {
-        AppDispatcher.dispatch({
-          actionType: ArticleConstants.RECEIVE_ARTICLE,
-          article: article
-        });
-      })
-      .catch(message => {
-        AppDispatcher.dispatch({
-          actionType: ArticleConstants.RECEIVE_ARTICLE_ERROR,
-          message: message
-        });
-      });
   }
-
 }
